@@ -1,0 +1,67 @@
+version: '3.9'
+
+services:
+  dialoqbase:
+    image: n4z3m/dialoqbase:latest
+    container_name: dialoqbase
+    restart: unless-stopped
+    ports:
+      - ${DIALOQBASE_PORT}:3000
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@dialoqbase-pg:5432/dialoqbase?connection_limit=15&pool_timeout=0
+      DB_REDIS_URL: redis://redis:6379
+    env_file:
+      - .env
+    depends_on:
+      - dialoqbase-pg
+      - redis
+    volumes:
+      - dialoqbase-uploads:/app/uploads
+    networks:
+      - dialoqbase
+
+  dialoqbase-pg:
+    image: pgvector/pgvector:pg16
+    container_name: dialoqbase-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: dialoqbase
+    volumes:
+      - dialoqbase-postgres:/var/lib/postgresql/data
+    networks:
+      - dialoqbase
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: unless-stopped
+    volumes:
+      - dialoqbase-redis:/data
+    networks:
+      - dialoqbase
+
+  # pgadmin:
+  #   image: dpage/pgadmin4
+  #   container_name: pgadmin4_container
+  #   restart: always
+  #   ports:
+  #     - "8888:80"
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: mikejohnsonit@gmail.com
+  #     PGADMIN_DEFAULT_PASSWORD: LockItDown2024
+  #   volumes:
+  #     - pgadmin-data:/var/lib/pgadmin
+  #   networks:
+  #     - dialoqbase
+
+volumes:
+  dialoqbase-uploads:
+  dialoqbase-postgres:
+  dialoqbase-redis:
+  pgadmin-data:
+
+networks:
+  dialoqbase:
+    driver: bridge

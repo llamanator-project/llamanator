@@ -1,0 +1,17 @@
+Congratulations, you have successfully deployed Llamanator!
+
+Note that only the services you chose to deploy in the .env file will be available.
+
+Here are the IP:PORT links to your services.
+
+Ollama: http://$SERVER_IP:11434
+OpenWebUI: http://$SERVER_IP:$OPENWEBUI_PORT
+Dialoqbase: http://$SERVER_IP:$DIALOQBASE_PORT
+
+
+If you defined a Domain Name for your server, below are the links for HTTPS access to you services. 
+Make sure you pointed your.domain.name and *.your.domain.name to your server IP.
+
+Ollama: $SERVER_IP:11434
+OpenWebUI: https://openwebui.$DOMAIN_NAME
+Dialoqbase: https://dialoqbase.$DOMAIN_NAME
