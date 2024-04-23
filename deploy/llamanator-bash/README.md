@@ -47,7 +47,7 @@ If you want to clean up Docker, you can run the `docker system prune -a` command
 ## Primary Project Sponsors:
 
 ### HighSide.ai
-<img src="../../assets/images/highside.ai-logo1-wide.png" alt="drawing" width="400"/>
+<img src="../../assets/images/highsideai-logo1-wide.png" alt="drawing" width="400"/>
 
 - **Website:** [https://highside.ai](https://highside.ai/)
 - **About:** HighSide.ai is a company that provides a wide range of scalable AI services to the US Government and DoD. From privately AI applications to secure LLM inferencing and ML training environments, HighSide.ai is a leader in secure AI.
