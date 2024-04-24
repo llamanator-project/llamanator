@@ -76,7 +76,6 @@ if docker run --rm \
     -v "${HAPROXY_PATH}/certs:/etc/haproxy/certs:ro" \
     haproxy:latest haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg; then
     echo "$(tput setaf 2)Configuration is valid, deploying HAProxy...$(tput sgr0)"
-    docker compose -f "${HAPROXY_PATH}/docker-compose.yml" up -d
 else
     echo "$(tput setaf 1)Configuration validation failed, please check the HAProxy configuration file.$(tput sgr0)"
     exit 1
