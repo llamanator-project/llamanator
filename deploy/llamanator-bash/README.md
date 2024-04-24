@@ -81,8 +81,8 @@ And then install the Nvidia container toolkit if you are have an Nvidia GPU: htt
 3. Copy the `.env.example` file to `.env`: `cp .env.example .env`
 4. Edit the `.env` file to enable the services you want to run. Please review the .env instructions below for the required options.
 5. Run the install script:
-    - To install with the Proxy on 80/443 run: `sudo ./install.sh`
-    - To install without the Proxy run: `sudo ./install_no_proxy.sh`
+    - To install with the Proxy on 80/443 run: `sudo ./install.sh --install-proxy`
+    - To install without the Proxy run: `sudo ./install.sh`
 6. Once complete, open the `./llamanator-links.txt` file to access your services
 
 
@@ -95,8 +95,8 @@ And then install the Nvidia container toolkit if you are have an Nvidia GPU: htt
 5. Copy the `.env.example` file to `.env`: `cp .env.example .env`
 6. Edit the `.env` file to enable the services you want to run. Please review the .env instructions below for the required options.
 7. Run the install script:
-    - To install with the Proxy on 80/443 run: `sudo ./install.sh`
-    - To install without the Proxy run: `sudo ./install_no_prox.sh`
+    - To install with the Proxy on 80/443 run: `sudo ./install.sh --install-proxy`
+    - To install without the Proxy run: `sudo ./install.sh`
 8. Once complete, open the `./llamanator-links.txt` file to access your services
 
 *NOTE ABOUT MACOS*: In some services, the `127.0.0.1` and `localhost` may not work. You may need to use the IP address of your machine to access the services.

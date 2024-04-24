@@ -8,82 +8,99 @@ skip_service() {
     echo "$(tput setaf 3)Skipping service $1...$(tput sgr0)"
 }
 
-# Define path to the user-provided cert-bundle.pem
-CERT_BUNDLE_PATH="${HAPROXY_PATH}/user-provided-certs/cert-bundle.pem"
-
-# Function to substitute variables in the template file
-# Function to substitute variables in the template file
-substitute_variables() {
+# Function to replace placeholders in the template
+replace_placeholders() {
     local template_file="$1"
     local output_file="$2"
-    : > "$output_file" # Clear the output file before writing
-
-    # Read the template file line by line
+    
+    # Clear the output file
+    > "$output_file"
+    
+    # Read template file line by line
     while IFS= read -r line; do
-        # Check if line contains a placeholder (variable in the format "{{VAR_NAME}}")
+        # Check if line contains a placeholder ({{...}})
         while [[ $line =~ \{\{([^}]+)\}\} ]]; do
-            # Extract the variable name from the placeholder
-            variable="${BASH_REMATCH[1]}"
-            # Get the value of the variable from the environment
-            value="${!variable}"
+            # Extract the placeholder name
+            placeholder="${BASH_REMATCH[1]}"
+            # Check if the placeholder corresponds to a variable in the environment or .env
+            if [ -n "${!placeholder}" ]; then
+                # Get the value of the variable from the environment
+                value="${!placeholder}"
+            elif grep -q "^$placeholder=" .env; then
+                # Get the value of the variable from .env
+                value=$(grep "^$placeholder=" .env | cut -d '=' -f 2-)
+            else
+                # If placeholder not found, exit the loop
+                break
+            fi
             # Replace the placeholder with the value
-            line="${line//\{\{$variable\}\}/$value}"
+            line="${line//\{\{$placeholder\}\}/$value}"
         done
         # Write the line to the output file
         echo "$line" >> "$output_file"
     done < "$template_file"
 }
 
+# Check if --install-proxy flag is provided
+if [ "$1" = "--install-proxy" ]; then
+    # Define path to the user-provided cert-bundle.pem
+    CERT_BUNDLE_PATH="${HAPROXY_PATH}/user-provided-certs/cert-bundle.pem"
 
-# Check if cert-bundle.pem does not exist
-if [ ! -f "$CERT_BUNDLE_PATH" ]; then
-    echo "$(tput setaf 2)Setting up SSL certificates...$(tput sgr0)"
+    # Check if cert-bundle.pem does not exist
+    if [ ! -f "$CERT_BUNDLE_PATH" ]; then
+        echo "$(tput setaf 2)Setting up SSL certificates...$(tput sgr0)"
 
-    # Ensure the target directory exists and set permissions
-    mkdir -p "${HAPROXY_PATH}/certs"
-    chmod 755 "${HAPROXY_PATH}/certs"
+        # Ensure the target directory exists and set permissions
+        mkdir -p "${HAPROXY_PATH}/certs"
+        chmod 755 "${HAPROXY_PATH}/certs"
 
-    # Run Docker container to generate SSL certificates
-    if docker run --rm -v "${HAPROXY_PATH}/certs:/certs" -e SSL_SUBJECT="${DOMAIN_NAME}" -e SSL_IP="${SERVER_IP}" paulczar/omgwtfssl > /dev/null 2>&1; then
-        echo "$(tput setaf 2)SSL certificates created successfully.$(tput sgr0)"
-        # Concatenate key and cert into a single bundle
-        sudo cat "${HAPROXY_PATH}/certs/key.pem" "${HAPROXY_PATH}/certs/cert.pem" > "${HAPROXY_PATH}/certs/cert-bundle.pem"
+        # Run Docker container to generate SSL certificates
+        if docker run --rm -v "${HAPROXY_PATH}/certs:/certs" -e SSL_SUBJECT="${DOMAIN_NAME}" -e SSL_IP="${SERVER_IP}" paulczar/omgwtfssl > /dev/null 2>&1; then
+            echo "$(tput setaf 2)SSL certificates created successfully.$(tput sgr0)"
+            # Concatenate key and cert into a single bundle
+            sudo cat "${HAPROXY_PATH}/certs/key.pem" "${HAPROXY_PATH}/certs/cert.pem" > "${HAPROXY_PATH}/certs/cert-bundle.pem"
+        else
+            echo "$(tput setaf 1)Failed to create SSL certificates. Check Docker and volume permissions.$(tput sgr0)"
+            exit 1
+        fi
     else
-        echo "$(tput setaf 1)Failed to create SSL certificates. Check Docker and volume permissions.$(tput sgr0)"
+        echo "$(tput setaf 3)User-provided SSL certificate bundle already exists. Skipping setup...$(tput sgr0)"
+    fi
+
+    # Copy user provided certs
+    if [ -f "$CERT_BUNDLE_PATH" ]; then
+        echo "$(tput setaf 2)Copying user-provided SSL certificates...$(tput sgr0)"
+        mkdir -p "${HAPROXY_PATH}/certs"
+        cp "$CERT_BUNDLE_PATH" "${HAPROXY_PATH}/certs/cert-bundle.pem"
+    else
+        echo "$(tput setaf 3)User-provided SSL certificate bundle not found. Skipping copy...$(tput sgr0)"
+    fi
+
+    # Replace placeholders in the HAProxy configuration template
+    replace_placeholders "${HAPROXY_PATH}${CONFIG_TEMPLATE}" "${HAPROXY_PATH}${CONFIG_OUTPUT}"
+    echo "$(tput setaf 2)HAProxy configuration file created.$(tput sgr0)"
+
+    # Validate HAProxy configuration using Docker
+    echo "$(tput setaf 2)Validating HAProxy configuration using Docker...$(tput sgr0)"
+    if docker run --rm \
+        -v "${HAPROXY_PATH}${CONFIG_OUTPUT}:/usr/local/etc/haproxy/haproxy.cfg:ro" \
+        -v "${HAPROXY_PATH}/certs:/etc/haproxy/certs:ro" \
+        haproxy:latest haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg; then
+        echo "$(tput setaf 2)Configuration is valid, deploying HAProxy...$(tput sgr0)"
+    else
+        echo "$(tput setaf 1)Configuration validation failed, please check the HAProxy configuration file.$(tput sgr0)"
         exit 1
     fi
+
+    # Run HAProxy
+    echo "$(tput setaf 2)Deploying HAProxy...$(tput sgr0)"
+    docker compose -f ${HAPROXY_PATH}/docker-compose.yml up -d
+
+    # Set a flag to indicate proxy installation
+    PROXY_INSTALLED=true
 else
-    echo "$(tput setaf 3)User-provided SSL certificate bundle already exists. Skipping setup...$(tput sgr0)"
+    PROXY_INSTALLED=false
 fi
-
-# Copy user provided certs
-if [ -f "$CERT_BUNDLE_PATH" ]; then
-    echo "$(tput setaf 2)Copying user-provided SSL certificates...$(tput sgr0)"
-    mkdir -p "${HAPROXY_PATH}/certs"
-    cp "$CERT_BUNDLE_PATH" "${HAPROXY_PATH}/certs/cert-bundle.pem"
-else
-    echo "$(tput setaf 3)User-provided SSL certificate bundle not found. Skipping copy...$(tput sgr0)"
-fi
-
-# Substitute environment variables into the HAProxy configuration
-substitute_variables "${HAPROXY_PATH}${CONFIG_TEMPLATE}" "${HAPROXY_PATH}${CONFIG_OUTPUT}"
-echo "$(tput setaf 2)HAProxy configuration file created.$(tput sgr0)"
-
-# Validate HAProxy configuration using Docker
-echo "$(tput setaf 2)Validating HAProxy configuration using Docker...$(tput sgr0)"
-if docker run --rm \
-    -v "${HAPROXY_PATH}${CONFIG_OUTPUT}:/usr/local/etc/haproxy/haproxy.cfg:ro" \
-    -v "${HAPROXY_PATH}/certs:/etc/haproxy/certs:ro" \
-    haproxy:latest haproxy -c -f /usr/local/etc/haproxy/haproxy.cfg; then
-    echo "$(tput setaf 2)Configuration is valid, deploying HAProxy...$(tput sgr0)"
-else
-    echo "$(tput setaf 1)Configuration validation failed, please check the HAProxy configuration file.$(tput sgr0)"
-    exit 1
-fi
-
-# Run HAProxy
-echo "$(tput setaf 2)Deploying HAProxy...$(tput sgr0)"
-docker compose -f ${HAPROXY_PATH}/docker-compose.yml up -d
 
 # Create private network
 if ! docker network inspect llamanator &> /dev/null; then
@@ -93,7 +110,7 @@ else
     echo "$(tput setaf 3)Private network already exists. Skipping creation...$(tput sgr0)"
 fi
 
-## Ollama CPU
+# Ollama CPU
 if [ "$ENABLE_OLLAMACPU" = "true" ]; then
     echo "$(tput setaf 2)Deploying Ollama CPU...$(tput sgr0)"
     docker compose -f ${OLLAMACPU_COMPOSE_FILE} up -d
@@ -153,7 +170,7 @@ fi
 if [ "$ENABLE_OPENWEBUI" = "true" ]; then
     echo "$(tput setaf 2)Deploying OpenWebUI...$(tput sgr0)"
     cat ${OPENWEBUI_COMPOSE_FILE%/*}/.env .env > ${OPENWEBUI_COMPOSE_FILE%/*}/.llamanator-openwebui.env
-    docker compose -f ${OPENWEBUI_COMPOSE_FILE} --env-file ${OPENWEBUI_COMPOSE_FILE%/*}/.llamanator-openwebui.env up -d 
+    docker compose -f ${OPENWEBUI_COMPOSE_FILE} --env-file ${OPENWEBUI_COMPOSE_FILE%/*}/.llamanator-openwebui.env up -d
 else
     skip_service "OpenWebUI"
 fi
@@ -167,44 +184,26 @@ else
     skip_service "Dialoqbase"
 fi
 
+# Create a temporary file to store the modified template content
+temp_file=$(mktemp)
+
+# Modify the template content based on the proxy installation flag
+if [ "$PROXY_INSTALLED" = true ]; then
+    # Include both sections in the template
+    cat "$LINKS_TEMPLATE" > "$temp_file"
+else
+    # Include only the top section in the template
+    sed '/If you defined a Domain Name/,$d' "$LINKS_TEMPLATE" > "$temp_file"
+fi
+
 set -a
 source .env
 
-# Function to replace placeholders in the template
-replace_placeholders() {
-    template_file="$1"
-    output_file="$2"
-    
-    # Clear the output file
-    > "$output_file"
-    
-    # Read template file line by line
-    while IFS= read -r line; do
-        # Check if line contains a placeholder ({{...}})
-        while [[ $line =~ \{\{([^}]+)\}\} ]]; do
-            # Extract the placeholder name
-            placeholder="${BASH_REMATCH[1]}"
-            # Check if the placeholder corresponds to a variable in .env
-            if grep -q "^$placeholder=" .env; then
-                # Get the value of the variable from .env
-                value=$(grep "^$placeholder=" .env | cut -d '=' -f 2-)
-                # Replace the placeholder with the value
-                line=$(echo "$line" | sed "s|{{$placeholder}}|$value|g")
-            else
-                # If placeholder not found, exit the loop
-                break
-            fi
-        done
-        # Write the line to the output file
-        echo "$line" >> "$output_file"
-    done < "$template_file"
-}
+# Replace placeholders in the modified template
+replace_placeholders "$temp_file" "$LINKS_OUTPUT"
 
-# Copy template file to output file
-cp "$LINKS_TEMPLATE" "$LINKS_OUTPUT"
-
-# Call function to replace placeholders
-replace_placeholders "$LINKS_TEMPLATE" "$LINKS_OUTPUT"
+# Remove the temporary file
+rm "$temp_file"
 
 set +a
 echo "$(tput setaf 2)Llamanator link file created at ${LINKS_OUTPUT}.$(tput sgr0)"
