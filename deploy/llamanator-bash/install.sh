@@ -129,9 +129,30 @@ else
     skip_service "Dialoqbase"
 fi
 
-# Create Links TXT file
 set -a
-source ../.env
-envsubst < "${LINKS_TEMPLATE}" > "${LINKS_OUTPUT}"
+source .env
+
+# Function to replace placeholders in the template
+replace_placeholders() {
+    template_file="$1"
+    output_file="$2"
+    
+    # Extract variable names from .env file and replace in template
+    while IFS='=' read -r key _; do
+        # Replace placeholders with actual values
+        sed -i '' -e "s/{{$key}}/${!key}/g" "$output_file"
+    done < ../.env
+}
+
+# Variables for LINKS files
+LINKS_TEMPLATE="./templates/llamanator-links.txt.template"
+LINKS_OUTPUT="./llamanator-links.txt"
+
+# Copy template file to output file
+cp "$LINKS_TEMPLATE" "$LINKS_OUTPUT"
+
+# Call function to replace placeholders
+replace_placeholders "$LINKS_TEMPLATE" "$LINKS_OUTPUT"
+
 set +a
 echo -e "\e[32mLlamanator link file created at ${LINKS_OUTPUT}.\e[0m"
