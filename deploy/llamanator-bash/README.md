@@ -58,7 +58,7 @@ Make sure that you have the Nvidia container toolkit installed on your system if
 
 If you want to install Docker and Docker Compose with out provided script, you can follow the instructions below:
 
-1. Run the following command to install Docker: `./scripts/install_docker_ubuntu.sh`
+1. Run the following command to install Docker: `./install_docker_ubuntu.sh`
 2. If you are not running as root, run the following command to add your user to the Docker group: `sudo usermod -aG docker $USER`
 3. Logout and log back into your terminal session
 4. Verify that Docker is installed by running: `docker --version`
@@ -80,8 +80,8 @@ And then install the Nvidia container toolkit if you are have an Nvidia GPU: htt
 3. Copy the `.env.example` file to `.env`: `cp .env.example .env`
 4. Edit the `.env` file to enable the services you want to run. Please review the .env instructions below for the required options.
 5. Run the install script:
-    - To install with the Proxy on 80/443 run: `sudo ./scripts/install.sh`
-    - To install without the Proxy run: `sudo ./scripts/install_no_proxy.sh`
+    - To install with the Proxy on 80/443 run: `sudo ./install.sh`
+    - To install without the Proxy run: `sudo ./install_no_proxy.sh`
 6. Once complete, open the `./llamanator-links.txt` file to access your services
 
 
@@ -94,8 +94,8 @@ And then install the Nvidia container toolkit if you are have an Nvidia GPU: htt
 5. Copy the `.env.example` file to `.env`: `cp .env.example .env`
 6. Edit the `.env` file to enable the services you want to run. Please review the .env instructions below for the required options.
 7. Run the install script:
-    - To install with the Proxy on 80/443 run: `sudo ./scripts/install.sh`
-    - To install without the Proxy run: `sudo ./scripts/install_no_prox.sh`
+    - To install with the Proxy on 80/443 run: `sudo ./install.sh`
+    - To install without the Proxy run: `sudo ./install_no_prox.sh`
 8. Once complete, open the `./llamanator-links.txt` file to access your services
 
 
@@ -118,9 +118,9 @@ Below are the only values you should need to change in the `.env` file:
 
 There are 2 options to remove the Llamanator project from your machine:
 
-**Option 1**: Run the uninstall script: `sudo ./scripts/uninstall.sh`. This will remove all Llamanator services but leave the Docker volumes. This is useful if you want to just run the `./install.sh` script again to bring all services back up and still have access to your previous data.
+**Option 1**: Run the uninstall script: `sudo ./uninstall.sh`. This will remove all Llamanator services but leave the Docker volumes. This is useful if you want to just run the `./install.sh` script again to bring all services back up and still have access to your previous data.
 
-**Option 2**: Run the uninstall script with the `sudo  ./scripts/uninstall_remove_data.sh`. This will remove ALL Llamanator services and the Docker volumes (including ALL data). This is useful if you want to completely remove the Llamanator project from your machine.
+**Option 2**: Run the uninstall script with the `sudo  ./uninstall_remove_data.sh`. This will remove ALL Llamanator services and the Docker volumes (including ALL data). This is useful if you want to completely remove the Llamanator project from your machine.
 
 ## Note about Ollama
 

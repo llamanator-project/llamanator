@@ -1,12 +1,51 @@
 #!/bin/bash
 
 # Load environment variables from .env file
-source ../.env
+source .env
 
 # Function to skip a service
 skip_service() {
     echo -e "\e[33mSkipping service $1...\e[0m"
 }
+
+# Define path to the user-provided cert-bundle.pem
+CERT_BUNDLE_PATH="${HAPROXY_PATH}/user-provided-certs/cert-bundle.pem"
+
+# Check if cert-bundle.pem does not exist
+if [ ! -f "$CERT_BUNDLE_PATH" ]; then
+    echo -e "\e[32mSetting up SSL certificates...\e[0m"
+    
+    # Ensure the target directory exists
+    mkdir -p "${HAPROXY_PATH}/certs"
+    
+    # Run Docker container to generate SSL certificates
+    docker run --rm -v "${HAPROXY_PATH}/certs:/certs" -e SSL_SUBJECT="${DOMAIN_NAME}" -e SSL_IP="${SERVER_IP}" paulczar/omgwtfssl > /dev/null 2>&1
+    
+    # Concatenate key and cert into a single bundle
+    sudo cat "${HAPROXY_PATH}/certs/key.pem" "${HAPROXY_PATH}/certs/cert.pem" > "${HAPROXY_PATH}/certs/cert-bundle.pem"
+else
+    echo -e "\e[33mUser-provided SSL certificate bundle already exists. Skipping setup...\e[0m"
+fi
+
+# Copy user provided certs
+if [ -f "$CERT_BUNDLE_PATH" ]; then
+    echo -e "\e[32mCopying user-provided SSL certificates...\e[0m"
+    mkdir -p "${HAPROXY_PATH}/certs"
+    cp "$CERT_BUNDLE_PATH" "${HAPROXY_PATH}/certs/cert-bundle.pem"
+else
+    echo -e "\e[33mUser-provided SSL certificate bundle not found. Skipping copy...\e[0m"
+fi
+
+# Substitute environment variables into the HAProxy configuration
+set -a
+source ../.env
+source ../.env && envsubst < "${HAPROXY_PATH}${CONFIG_TEMPLATE}" > "${HAPROXY_PATH}${CONFIG_OUTPUT}"
+set +a
+echo -e "\e[32mHAProxy configuration file created.\e[0m"
+
+# Run HAProxy
+echo -e "\e[32mDeploying HAProxy...\e[0m"
+docker compose -f ${HAPROXY_PATH}/docker-compose.yml up -d
 
 # Create private network
 if ! docker network inspect llamanator &> /dev/null; then
@@ -92,7 +131,7 @@ fi
 
 # Create Links TXT file
 set -a
-source .env
+source ../.env
 envsubst < "${LINKS_TEMPLATE}" > "${LINKS_OUTPUT}"
 set +a
 echo -e "\e[32mLlamanator link file created at ${LINKS_OUTPUT}.\e[0m"
