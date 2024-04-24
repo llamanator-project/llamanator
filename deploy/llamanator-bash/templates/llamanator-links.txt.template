@@ -4,14 +4,14 @@ Note that only the services you chose to deploy in the .env file will be availab
 
 Here are the IP:PORT links to your services. Use this if you don't have a domain name or deployed without the proxy.
 
-Ollama: http://$SERVER_IP:11434
-OpenWebUI: http://$SERVER_IP:$OPENWEBUI_PORT
-Dialoqbase: http://$SERVER_IP:$DIALOQBASE_PORT
+Ollama: http://{{SERVER_IP}}:11434
+OpenWebUI: http://{{SERVER_IP}}:{{OPENWEBUI_PORT}}
+Dialoqbase: http://{{SERVER_IP}}:{{DIALOQBASE_PORT}}
 
 
-If you defined a Domain Name for your server, below are the links for HTTPS access to you services. 
+If you defined a Domain Name for your server, below are the links for HTTPS access to your services. 
 Make sure you pointed your.domain.name and *.your.domain.name to your server IP.
 
-Ollama: $SERVER_IP:11434
-OpenWebUI: https://openwebui.$DOMAIN_NAME
-Dialoqbase: https://dialoqbase.$DOMAIN_NAME
+Ollama: https://{{SERVER_IP}}:11434
+OpenWebUI: https://openwebui.{{DOMAIN_NAME}}
+Dialoqbase: https://dialoqbase.{{DOMAIN_NAME}}

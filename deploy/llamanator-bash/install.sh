@@ -72,7 +72,7 @@ else
 fi
 
 # Define a common list of models to download
-models=("llama2" "mistral" "nomic-embed-text" "codellama" "llama3")
+models=("llama2" "mistral" "nomic-embed-text" "codellama" "llama3" "phi3")
 
 # Function to download models
 download_models() {
@@ -137,16 +137,27 @@ replace_placeholders() {
     template_file="$1"
     output_file="$2"
     
-    # Extract variable names from .env file and replace in template
-    while IFS='=' read -r key _; do
-        # Replace placeholders with actual values
-        sed -i '' -e "s/{{$key}}/${!key}/g" "$output_file"
-    done < ../.env
+    # Clear the output file
+    > "$output_file"
+    
+    # Read template file line by line
+    while IFS= read -r line; do
+        # Check if line contains a placeholder ({{...}})
+        if [[ $line =~ \{\{([^}]+)\}\} ]]; then
+            # Extract the placeholder name
+            placeholder="${BASH_REMATCH[1]}"
+            # Check if the placeholder corresponds to a variable in .env
+            if grep -q "^$placeholder=" .env; then
+                # Get the value of the variable from .env
+                value=$(grep "^$placeholder=" .env | cut -d '=' -f 2-)
+                # Replace the placeholder with the value
+                line=$(echo "$line" | sed "s|{{$placeholder}}|$value|g")
+            fi
+        fi
+        # Write the line to the output file
+        echo "$line" >> "$output_file"
+    done < "$template_file"
 }
-
-# Variables for LINKS files
-LINKS_TEMPLATE="./templates/llamanator-links.txt.template"
-LINKS_OUTPUT="./llamanator-links.txt"
 
 # Copy template file to output file
 cp "$LINKS_TEMPLATE" "$LINKS_OUTPUT"

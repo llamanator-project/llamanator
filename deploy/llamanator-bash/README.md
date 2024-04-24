@@ -108,11 +108,11 @@ Below are the only values you should need to change in the `.env` file:
 - `ENABLE_OLLAMA_BASE_MODELS`: Set to `true` to enable the Ollama base model downloads. This will download the base models for the Ollama service.
 - `ENABLE_OPENWEBUI`: Set to `true` to enable the OpenWebUI service
 - `ENABLE_DIALOQBASE`: Set to `true` to enable the Dialoqbase Retrieval Augmented Generation (RAG) service
-- `SERVER_IP`: Set this to `localhost` if you are running on a local machine. If you are running on a server and want other machines to be able to access the services, set this to the IP address of the server.
+- `SERVER_IP`: Set this to `127.0.0.1` if you are running on a local machine. If you are running on a server and want other machines to be able to access the services, set this to the IP address of the server.
 - `DOMAIN_NAME`: Set this to the domain name of your server if you have one (must use the install with Proxy). You will want to point the following entries to the IP address of your server in your DNS settings.
   - openwebui.yourdomain.com
   - dialoqbase.yourdomain.com
-- `OLLAMA_ENDPOINT`: If you want to inference against an Ollama service running on a different machine, set this to the IP address or domain name of the machine running the Ollama service. If you are running the Ollama service on the same machine, leave this as `localhost`. Make sure that your Ollama service is exposed on the network and the machine you are running the Llamanator Bash script on can access the Ollama service.
+- `OLLAMA_ENDPOINT`: If you want to inference against an Ollama service running on a different machine, set this to the IP address or domain name of the machine running the Ollama service. If you are running the Ollama service on the same machine, leave this as `127.0.0.1`. Make sure that your Ollama service is exposed on the network and the machine you are running the Llamanator Bash script on can access the Ollama service.
 
 ## Uninstall Llamanator Bash
 
