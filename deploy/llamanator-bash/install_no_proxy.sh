@@ -5,20 +5,20 @@ source .env
 
 # Function to skip a service
 skip_service() {
-    echo -e "\e[33mSkipping service $1...\e[0m"
+    echo "$(tput setaf 3)Skipping service $1...$(tput sgr0)"
 }
 
 # Create private network
 if ! docker network inspect llamanator &> /dev/null; then
-    echo -e "\e[32mCreating private network...\e[0m"
+    echo "$(tput setaf 2)Creating private network...$(tput sgr0)"
     docker network create llamanator || handle_error "Creating network" "Failed to create private network"
 else
-    echo -e "\e[33mPrivate network already exists. Skipping creation...\e[0m"
+    echo "$(tput setaf 3)Private network already exists. Skipping creation...$(tput sgr0)"
 fi
 
 ## Ollama CPU
 if [ "$ENABLE_OLLAMACPU" = "true" ]; then
-    echo -e "\e[32mDeploying Ollama CPU...\e[0m"
+    echo "$(tput setaf 2)Deploying Ollama CPU...$(tput sgr0)"
     docker compose -f ${OLLAMACPU_COMPOSE_FILE} up -d
 else
     skip_service "Ollama CPU"
@@ -26,7 +26,7 @@ fi
 
 # Ollama GPU
 if [ "$ENABLE_OLLAMAGPU" = "true" ]; then
-    echo -e "\e[32mDeploying Ollama GPU...\e[0m"
+    echo "$(tput setaf 2)Deploying Ollama GPU...$(tput sgr0)"
     docker compose -f ${OLLAMAGPU_COMPOSE_FILE} up -d
 else
     skip_service "Ollama GPU"
@@ -38,7 +38,7 @@ models=("llama2" "mistral" "nomic-embed-text" "codellama" "llama3" "phi3")
 # Function to download models
 download_models() {
     for model in "${models[@]}"; do
-        echo -e "\e[32mDownloading $model...\e[0m"
+        echo "$(tput setaf 2)Downloading $model...$(tput sgr0)"
         # Check if the system is macOS
         if [ "$(uname)" == "Darwin" ]; then
             ollama pull "$model"
@@ -54,7 +54,7 @@ if [ "$(uname)" == "Darwin" ]; then
 else
     # Check if base models are enabled
     if [ "$ENABLE_OLLAMA_BASE_MODELS" = "true" ]; then
-        echo -e "\e[32mDownloading Ollama models...\e[0m"
+        echo "$(tput setaf 2)Downloading Ollama models...$(tput sgr0)"
         
         # Check if CPU models are enabled
         if [ "$ENABLE_OLLAMACPU" = "true" ]; then
@@ -74,7 +74,7 @@ fi
 
 # OpenWebUI
 if [ "$ENABLE_OPENWEBUI" = "true" ]; then
-    echo -e "\e[32mDeploying OpenWebUI...\e[0m"
+    echo "$(tput setaf 2)Deploying OpenWebUI...$(tput sgr0)"
     cat ${OPENWEBUI_COMPOSE_FILE%/*}/.env .env > ${OPENWEBUI_COMPOSE_FILE%/*}/.llamanator-openwebui.env
     docker compose -f ${OPENWEBUI_COMPOSE_FILE} --env-file ${OPENWEBUI_COMPOSE_FILE%/*}/.llamanator-openwebui.env up -d
 else
@@ -83,7 +83,7 @@ fi
 
 # Dialoqbase
 if [ "$ENABLE_DIALOQBASE" = "true" ]; then
-    echo -e "\e[32mDeploying Dialoqbase...\e[0m"
+    echo "$(tput setaf 2)Deploying Dialoqbase...$(tput sgr0)"
     cat ${DIALOQBASE_COMPOSE_FILE%/*}/.env .env > ${DIALOQBASE_COMPOSE_FILE%/*}/.llamanator-dialoqbase.env
     docker compose -f ${DIALOQBASE_COMPOSE_FILE} --env-file ${DIALOQBASE_COMPOSE_FILE%/*}/.llamanator-dialoqbase.env up -d
 else
@@ -104,7 +104,7 @@ replace_placeholders() {
     # Read template file line by line
     while IFS= read -r line; do
         # Check if line contains a placeholder ({{...}})
-        if [[ $line =~ \{\{([^}]+)\}\} ]]; then
+        while [[ $line =~ \{\{([^}]+)\}\} ]]; do
             # Extract the placeholder name
             placeholder="${BASH_REMATCH[1]}"
             # Check if the placeholder corresponds to a variable in .env
@@ -113,8 +113,11 @@ replace_placeholders() {
                 value=$(grep "^$placeholder=" .env | cut -d '=' -f 2-)
                 # Replace the placeholder with the value
                 line=$(echo "$line" | sed "s|{{$placeholder}}|$value|g")
+            else
+                # If placeholder not found, exit the loop
+                break
             fi
-        fi
+        done
         # Write the line to the output file
         echo "$line" >> "$output_file"
     done < "$template_file"
@@ -127,4 +130,4 @@ cp "$LINKS_TEMPLATE" "$LINKS_OUTPUT"
 replace_placeholders "$LINKS_TEMPLATE" "$LINKS_OUTPUT"
 
 set +a
-echo -e "\e[32mLlamanator link file created at ${LINKS_OUTPUT}.\e[0m"
+echo "$(tput setaf 2)Llamanator link file created at ${LINKS_OUTPUT}.$(tput sgr0)"

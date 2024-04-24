@@ -32,11 +32,11 @@ frontend https_in
         acl tls req.ssl_hello_type 1
         http-request redirect scheme https unless { ssl_fc }
         
-        use_backend openwebui if { hdr(host) openwebui.${DOMAIN_NAME} }
-        use_backend dialoqbase if { hdr(host) dialoqbase.${DOMAIN_NAME} }
+        use_backend openwebui if { hdr(host) openwebui.{{DOMAIN_NAME}} }
+        use_backend dialoqbase if { hdr(host) dialoqbase.{{DOMAIN_NAME}} }
 
 backend openwebui
-        server openwebui $SERVER_IP:$OPENWEBUI_PORT check
+        server openwebui {{SERVER_IP}}:{{OPENWEBUI_PORT}} check
 
 backend dialoqbase
-        server dialoqbase $SERVER_IP:$DIALOQBASE_PORT check
+        server dialoqbase {{SERVER_IP}}:{{DIALOQBASE_PORT}} check

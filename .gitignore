@@ -2,9 +2,11 @@
 **/ollama_data
 **/deploy/llamanator-bash/.env
 **/haproxy/certs
-./llamanator-links.txt
+**llamanator-links.txt
 **/archive
 **/user-provided-certs/cert-bundle.pem
+**/haproxy.cfg
+**/.llamanator-*.env
 
 ### Linux ###
 *~
