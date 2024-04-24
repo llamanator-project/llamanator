@@ -50,6 +50,7 @@ This script exposes many ports and services on your system. It is recommended th
 ## Install Docker and Docker Compose
 
 ### Linux
+
 If you system already has Docker and Docker Compose installed, you can skip this step.
 
 Make sure that you have the Nvidia container toolkit installed on your system if you choose the GPU install. You can follow the instructions here: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
@@ -98,6 +99,8 @@ And then install the Nvidia container toolkit if you are have an Nvidia GPU: htt
     - To install without the Proxy run: `sudo ./install_no_prox.sh`
 8. Once complete, open the `./llamanator-links.txt` file to access your services
 
+*NOTE ABOUT MACOS*: In some services, the `127.0.0.1` and `localhost` may not work. You may need to use the IP address of your machine to access the services.
+
 
 ## .env File Options
 
@@ -118,9 +121,12 @@ Below are the only values you should need to change in the `.env` file:
 
 There are 2 options to remove the Llamanator project from your machine:
 
-**Option 1**: Run the uninstall script: `sudo ./uninstall.sh`. This will remove all Llamanator services but leave the Docker volumes. This is useful if you want to just run the `./install.sh` script again to bring all services back up and still have access to your previous data.
+1. Just stop the services and keep the data: `sudo ./uninstall.sh`
+2. Stop the services and remove all data: `sudo ./uninstall.sh --remove-all-data`
 
-**Option 2**: Run the uninstall script with the `sudo  ./uninstall_remove_data.sh`. This will remove ALL Llamanator services and the Docker volumes (including ALL data). This is useful if you want to completely remove the Llamanator project from your machine.
+## Restarting Llamanator Bash
+
+Regardless of the uninstall option you choose, you can restart the Llamanator project by running the `./install.sh` script again. If the volumes are still present, the data will be re-attached to the services. If you removed the data, the services will start fresh.
 
 ## Note about Ollama
 
