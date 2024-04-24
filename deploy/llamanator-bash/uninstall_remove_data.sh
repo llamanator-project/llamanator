@@ -66,5 +66,5 @@ else
 fi
 
 # Remove Links file
-echo -e "\e[32mRemoving links file...\e[0m"
+echo -e "$(tput setaf 2)Removing links file...$(tput setaf 0)"
 rm -f ${LINKS_OUTPUT}
