@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Load environment variables from .env file
-source .env
+source ../.env
 
 # Function to skip a service
 skip_service() {
@@ -71,38 +71,44 @@ else
     skip_service "Ollama GPU"
 fi
 
-# Ollama CPU download models
-if [ "$ENABLE_OLLAMACPU" = "true" ] && [ "$ENABLE_OLLAMA_BASE_MODELS" = "true" ]; then
-    echo -e "\e[32mDownloading Ollama models...\e[0m"
-    echo -e "\e[32mDownloading llama2...\e[0m"
-    docker exec -it ollama ollama pull llama2
-    echo -e "\e[32mDownloading mistral...\e[0m"
-    docker exec -it ollama ollama pull mistral
-    echo -e "\e[32mDownloading nomic-embed-text...\e[0m"
-    docker exec -it ollama ollama pull nomic-embed-text
-    echo -e "\e[32mDownloading codellama...\e[0m"
-    docker exec -it ollama ollama pull codellama
-    echo -e "\e[32mDownloading llama3...\e[0m"
-    docker exec -it ollama ollama pull llama3
-else
-    skip_service "Ollama CPU base model download..."
-fi
+# Define a common list of models to download
+models=("llama2" "mistral" "nomic-embed-text" "codellama" "llama3")
 
-# Ollama GPU download models
-if [ "$ENABLE_OLLAMAGPU" = "true" ] && [ "$ENABLE_OLLAMA_BASE_MODELS" = "true" ]; then
-    echo -e "\e[32mDownloading Ollama models...\e[0m"
-    echo -e "\e[32mDownloading llama2...\e[0m"
-    docker exec -it ollama ollama pull llama2
-    echo -e "\e[32mDownloading mistral...\e[0m"
-    docker exec -it ollama ollama pull mistral
-    echo -e "\e[32mDownloading nomic-embed-text...\e[0m"
-    docker exec -it ollama ollama pull nomic-embed-text
-    echo -e "\e[32mDownloading codellama...\e[0m"
-    docker exec -it ollama ollama pull codellama
-    echo -e "\e[32mDownloading llama3...\e[0m"
-    docker exec -it ollama ollama pull llama3
+# Function to download models
+download_models() {
+    for model in "${models[@]}"; do
+        echo -e "\e[32mDownloading $model...\e[0m"
+        # Check if the system is macOS
+        if [ "$(uname)" == "Darwin" ]; then
+            ollama pull "$model"
+        else
+            docker exec -it ollama ollama pull "$model"
+        fi
+    done
+}
+
+# Check if the system is macOS
+if [ "$(uname)" == "Darwin" ]; then
+    download_models
 else
-    skip_service "Ollama GPU base model download..."
+    # Check if base models are enabled
+    if [ "$ENABLE_OLLAMA_BASE_MODELS" = "true" ]; then
+        echo -e "\e[32mDownloading Ollama models...\e[0m"
+        
+        # Check if CPU models are enabled
+        if [ "$ENABLE_OLLAMACPU" = "true" ]; then
+            download_models
+        else
+            skip_service "Ollama CPU base model download..."
+        fi
+        
+        # Check if GPU models are enabled
+        if [ "$ENABLE_OLLAMAGPU" = "true" ]; then
+            download_models
+        else
+            skip_service "Ollama GPU base model download..."
+        fi
+    fi
 fi
 
 # OpenWebUI

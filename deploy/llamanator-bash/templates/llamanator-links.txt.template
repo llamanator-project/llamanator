@@ -2,7 +2,7 @@ Congratulations, you have successfully deployed Llamanator!
 
 Note that only the services you chose to deploy in the .env file will be available.
 
-Here are the IP:PORT links to your services.
+Here are the IP:PORT links to your services. Use this if you don't have a domain name or deployed without the proxy.
 
 Ollama: http://$SERVER_IP:11434
 OpenWebUI: http://$SERVER_IP:$OPENWEBUI_PORT
