@@ -55,7 +55,7 @@ We do recommend a GPU for faster inferencing and vector processing, but it is no
 
 ## Services
 
-There are numerous services included in Llamanator. Each of these services is designed to be run as a Docker container.
+There are a few services included in Llamanator. Each of these services is designed to be run as a Docker container.
 
 The full list of the services and links included in Llamanator can be found [here](./services.md).
 
