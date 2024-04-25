@@ -4,9 +4,41 @@ Llamanator Bash is a collection of scripts to install and uninstall the Llamanat
 
 We will be releasing other versions of Llamanator that will be more secure and easier to use.
 
+---
+## Table of Contents
+- [Llamanator Bash](#llamanator-bash)
+  - [Table of Contents](#table-of-contents)
+  - [Security](#security)
+  - [Tools and Models Included](#tools-and-models-included)
+  - [Prerequisites](#prerequisites)
+    - [Linux](#linux)
+    - [MacOS](#macos)
+  - [Install Docker and Docker Compose](#install-docker-and-docker-compose)
+    - [Linux](#linux-1)
+    - [MacOS](#macos-1)
+  - [Using Your Own TLS Certificates](#using-your-own-tls-certificates)
+    - [Option 1 - Automatic Self Signed](#option-1---automatic-self-signed)
+    - [Option 2 - User Provided](#option-2---user-provided)
+  - [Install Llamanator Bash on Linux](#install-llamanator-bash-on-linux)
+  - [Install Llamanator Bash on MacOS with Proxy](#install-llamanator-bash-on-macos-with-proxy)
+  - [.env File Options](#env-file-options)
+  - [Uninstall Llamanator Bash](#uninstall-llamanator-bash)
+  - [Restarting Llamanator Bash](#restarting-llamanator-bash)
+  - [Note about Ollama](#note-about-ollama)
+    - [Linux](#linux-2)
+    - [MacOS](#macos-2)
+  - [Cleaning Up Docker](#cleaning-up-docker)
+  - [Primary Project Sponsors:](#primary-project-sponsors)
+    - [HighSide.ai](#highsideai)
+    - [AlphaBravo](#alphabravo)
+
+---
+
 ## Security
 
 This script exposes many ports and services on your system. It is recommended that you put a firewall in front of your server to only allow your IP address to access the server or run this on a private network.
+
+---
 
 ## Tools and Models Included
 
@@ -23,6 +55,8 @@ This script exposes many ports and services on your system. It is recommended th
 - Nomic Embed
 - Codellama
 - Phi3
+
+---
 
 ## Prerequisites
 
@@ -46,6 +80,8 @@ This script exposes many ports and services on your system. It is recommended th
 - At least 32GB of RAM
 - At least 100GB of free disk space
 - Port 80 and 443 open on your machine (if you want to use the proxy)
+
+---
 
 ## Install Docker and Docker Compose
 
@@ -74,6 +110,28 @@ And then install the Nvidia container toolkit if you are have an Nvidia GPU: htt
 
 1. Install Docker Desktop for Mac: https://docs.docker.com/desktop/install/mac-install/
 
+---
+
+## Using Your Own TLS Certificates
+
+If you intend on installing with a domain name and using the proxy, there are 2 options.
+
+### Option 1 - Automatic Self Signed
+
+Let the script generate a self-signed certificate for you. This is the easiest option and is recommended for most users.
+
+### Option 2 - User Provided
+
+Generate your own valid TLS certificates and use them with the proxy.
+
+You will need to create a file called `cert-bundle.pem` with the `private.key` at the top followed by the `fullchain.pem` file in a single file. Make sure all headers and footers are included like `-----BEGIN-----` and `-----END-----`.
+
+Once you have created the `cert-bundle.pem` file, you need to place it in the `./deploy/llamanator-bash/services/llamanator/haproxy/user-provided-certs` directory.
+
+Once that is done, run the install script with the `--install-proxy` option as shown below.
+
+---
+
 ## Install Llamanator Bash on Linux
 
 1. Clone this repo (if you haven't already): `git clone https://github.com/llamanator-project/llamanator.git`
@@ -84,6 +142,8 @@ And then install the Nvidia container toolkit if you are have an Nvidia GPU: htt
     - To install with the Proxy on 80/443 run: `sudo ./install.sh --install-proxy`
     - To install without the Proxy run: `sudo ./install.sh`
 6. Once complete, open the `./llamanator-links.txt` file to access your services
+
+---
 
 
 ## Install Llamanator Bash on MacOS with Proxy
@@ -101,6 +161,8 @@ And then install the Nvidia container toolkit if you are have an Nvidia GPU: htt
 
 *NOTE ABOUT MACOS*: In some services, the `127.0.0.1` and `localhost` may not work. You may need to use the IP address of your machine to access the services.
 
+---
+
 
 ## .env File Options
 
@@ -117,6 +179,8 @@ Below are the only values you should need to change in the `.env` file:
   - dialoqbase.yourdomain.com
 - `OLLAMA_ENDPOINT`: If you want to inference against an Ollama service running on a different machine, set this to the IP address or domain name of the machine running the Ollama service. If you are running the Ollama service on the same machine, leave this as `127.0.0.1`. Make sure that your Ollama service is exposed on the network and the machine you are running the Llamanator Bash script on can access the Ollama service.
 
+---
+
 ## Uninstall Llamanator Bash
 
 There are 2 options to remove the Llamanator project from your machine:
@@ -124,9 +188,13 @@ There are 2 options to remove the Llamanator project from your machine:
 1. Just stop the services and keep the data: `sudo ./uninstall.sh`
 2. Stop the services and remove all data: `sudo ./uninstall.sh --remove-all-data`
 
+---
+
 ## Restarting Llamanator Bash
 
 Regardless of the uninstall option you choose, you can restart the Llamanator project by running the `./install.sh` script again. If the volumes are still present, the data will be re-attached to the services. If you removed the data, the services will start fresh.
+
+---
 
 ## Note about Ollama
 
@@ -139,6 +207,8 @@ The Ollama data is stored locally on the disk so you can prevent having to downl
 The Ollama data is stored `~/.ollama/models` directory. If you want to remove all Ollama data, you can delete the `~/.ollama/models` directory.
 
 If you only want to remove specific LLMs, you can run `ollama rm <model_name>` to remove the LLM from the Ollama service.
+
+---
 
 ## Cleaning Up Docker
 
