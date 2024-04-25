@@ -65,7 +65,7 @@ This script exposes many ports and services on your system. It is recommended th
 - Ubuntu 22.04
 - Docker
 - Docker Compose
-- NVidia GPU (if you want to run the Ollama GPU service)
+- Nvidia GPU (if you want to run the Ollama GPU service)
 - Recommended 16vCPU and 32GB RAM (depending on services you want to run)
 - At least 100GB of free disk space
 - A user with sudo privileges (preferably passwordless sudo)
