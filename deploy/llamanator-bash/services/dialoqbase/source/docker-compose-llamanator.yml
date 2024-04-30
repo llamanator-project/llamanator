@@ -19,6 +19,7 @@ services:
       - dialoqbase-uploads:/app/uploads
     networks:
       - dialoqbase
+      - llamanator
 
   dialoqbase-pg:
     image: pgvector/pgvector:pg16
@@ -65,3 +66,7 @@ volumes:
 networks:
   dialoqbase:
     driver: bridge
+  llamanator:
+    name: llamanator
+    external: true
+
