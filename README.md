@@ -18,7 +18,6 @@
     - [Dockerized LLM Tools](#dockerized-llm-tools)
   - [Installation](#installation)
   - [Primary Project Sponsors:](#primary-project-sponsors)
-    - [HighSide.ai](#highsideai)
     - [AlphaBravo](#alphabravo)
 
 
@@ -76,14 +75,6 @@ The following are the current available installations for the Llamanator project
 ---
 
 ## Primary Project Sponsors:
-
-### HighSide.ai
-<img src="./assets/images/highsideai-logo1-wide.png" alt="drawing" width="400"/>
-
-- **Website:** [https://highside.ai](https://highside.ai/)
-- **About:** HighSide.ai is a company that provides a wide range of scalable AI services to the US Government and DoD. From privately AI applications to secure LLM inferencing and ML training environments, HighSide.ai is a leader in secure AI.
-
----
 
 ### AlphaBravo
 <img src="./assets/images/alphabravo-logo-1.png" alt="drawing" width="400"/>

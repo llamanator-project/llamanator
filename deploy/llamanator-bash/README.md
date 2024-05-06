@@ -20,7 +20,7 @@ We will be releasing other versions of Llamanator that will be more secure and e
     - [Option 1 - Automatic Self Signed](#option-1---automatic-self-signed)
     - [Option 2 - User Provided](#option-2---user-provided)
   - [Install Llamanator Bash on Linux](#install-llamanator-bash-on-linux)
-  - [Install Llamanator Bash on MacOS with Proxy](#install-llamanator-bash-on-macos-with-proxy)
+  - [Install Llamanator Bash on MacOS](#install-llamanator-bash-on-macos)
   - [.env File Options](#env-file-options)
   - [Uninstall Llamanator Bash](#uninstall-llamanator-bash)
   - [Restarting Llamanator Bash](#restarting-llamanator-bash)
@@ -29,7 +29,6 @@ We will be releasing other versions of Llamanator that will be more secure and e
     - [MacOS](#macos-2)
   - [Cleaning Up Docker](#cleaning-up-docker)
   - [Primary Project Sponsors:](#primary-project-sponsors)
-    - [HighSide.ai](#highsideai)
     - [AlphaBravo](#alphabravo)
 
 ---
@@ -145,8 +144,7 @@ Once that is done, run the install script with the `--install-proxy` option as s
 
 ---
 
-
-## Install Llamanator Bash on MacOS with Proxy
+## Install Llamanator Bash on MacOS
 
 1. Install Ollama on your Mac: https://ollama.com
 2. Set Ollama to be exposed on your machine by running `launchctl setenv OLLAMA_HOST "0.0.0.0"` and then restarting Ollama
@@ -217,14 +215,6 @@ If you want to clean up Docker, you can run the `docker system prune -a` command
 ---
 
 ## Primary Project Sponsors:
-
-### HighSide.ai
-<img src="../../assets/images/highsideai-logo1-wide.png" alt="drawing" width="400"/>
-
-- **Website:** [https://highside.ai](https://highside.ai/)
-- **About:** HighSide.ai is a company that provides a wide range of scalable AI services to the US Government and DoD. From privately AI applications to secure LLM inferencing and ML training environments, HighSide.ai is a leader in secure AI.
-
----
 
 ### AlphaBravo
 <img src="../../assets/images/alphabravo-logo-1.png" alt="drawing" width="400"/>
