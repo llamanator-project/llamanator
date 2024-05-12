@@ -14,3 +14,4 @@ services:
       - OLLAMA_MAX_LOADED_MODELS=${OLLAMA_MAX_LOADED_MODELS}
     ports:
       - "${OLLAMA_PORT}:11434"
+    restart: unless-stopped
