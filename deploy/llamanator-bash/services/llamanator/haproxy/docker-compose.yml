@@ -1,4 +1,5 @@
 version: "3.9"
+name: ${LLAMANATOR_COMPOSE_GROUP_NAME:-highsideai-stack}
 services:
 
   haproxy:

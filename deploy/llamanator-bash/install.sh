@@ -110,28 +110,25 @@ else
     echo "$(tput setaf 3)Private network already exists. Skipping creation...$(tput sgr0)"
 fi
 
-# Ollama CPU
-if [ "$ENABLE_OLLAMACPU" = "true" ]; then
-    echo "$(tput setaf 2)Deploying Ollama CPU...$(tput sgr0)"
-    docker compose -f ${OLLAMACPU_COMPOSE_FILE} up -d
-else
-    skip_service "Ollama CPU"
-fi
+llamanator_compose_args=("docker compose")
+llamanator_compose_args+=( "-f ${OLLAMA_COMPOSE_FILE}" )
 
 # Ollama GPU
 if [ "$ENABLE_OLLAMAGPU" = "true" ]; then
-    echo "$(tput setaf 2)Deploying Ollama GPU...$(tput sgr0)"
-    docker compose -f ${OLLAMAGPU_COMPOSE_FILE} up -d
-else
-    skip_service "Ollama GPU"
+    echo "$(tput setaf 2)Using Ollama GPU...$(tput sgr0)"
+    llamanator_compose_args+=( "-f ${OLLAMA_GPU_OVERRIDE_COMPOSE_FILE}")
 fi
 
-# Define a common list of models to download
-models=("llama2" "mistral" "nomic-embed-text" "codellama" "llama3" "phi3")
+llamanator_compose_args+=( "up -d" )
+
+echo "$(tput setaf 2)Deploying Ollama...$(tput sgr0)"
+${llamanator_compose_args[@]}
 
 # Function to download models
 download_models() {
-    for model in "${models[@]}"; do
+    echo "$(tput setaf 2)Downloading Ollama models...$(tput sgr0)"
+
+    for model in $PREDOWNLOAD_OLLAMA_MODELS; do
         echo "$(tput setaf 2)Downloading $model...$(tput sgr0)"
         # Check if the system is macOS
         if [ "$(uname)" == "Darwin" ]; then
@@ -142,29 +139,7 @@ download_models() {
     done
 }
 
-# Check if the system is macOS
-if [ "$(uname)" == "Darwin" ]; then
-    download_models
-else
-    # Check if base models are enabled
-    if [ "$ENABLE_OLLAMA_BASE_MODELS" = "true" ]; then
-        echo "$(tput setaf 2)Downloading Ollama models...$(tput sgr0)"
-
-        # Check if CPU models are enabled
-        if [ "$ENABLE_OLLAMACPU" = "true" ]; then
-            download_models
-        else
-            skip_service "Ollama CPU base model download..."
-        fi
-
-        # Check if GPU models are enabled
-        if [ "$ENABLE_OLLAMAGPU" = "true" ]; then
-            download_models
-        else
-            skip_service "Ollama GPU base model download..."
-        fi
-    fi
-fi
+download_models
 
 # OpenWebUI
 if [ "$ENABLE_OPENWEBUI" = "true" ]; then

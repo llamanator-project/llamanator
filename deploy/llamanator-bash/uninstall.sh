@@ -21,21 +21,8 @@ if [ "$1" = "--remove-all-data" ]; then
     fi
 
     # Remove the Llamanator service with volumes
-    # Remove Ollama CPU
-    if [ "$ENABLE_OLLAMACPU" = "true" ]; then
-        echo "$(tput setaf 2)Removing Ollama CPU...$(tput sgr0)"
-        docker compose -f ${OLLAMACPU_COMPOSE_FILE} down -v
-    else
-        echo "$(tput setaf 3)Skipping Ollama CPU...$(tput sgr0)"
-    fi
-
-    # Remove Ollama GPU
-    if [ "$ENABLE_OLLAMAGPU" = "true" ]; then
-        echo "$(tput setaf 2)Removing Ollama GPU...$(tput sgr0)"
-        docker compose -f ${OLLAMAGPU_COMPOSE_FILE} down -v
-    else
-        echo "$(tput setaf 3)Skipping Ollama GPU...$(tput sgr0)"
-    fi
+    echo "$(tput setaf 2)Removing Ollama...$(tput sgr0)"
+    docker compose -f ${OLLAMA_COMPOSE_FILE} down -v
 
     # Remove OpenWebUI
     if [ "$ENABLE_OPENWEBUI" = "true" ]; then
@@ -65,21 +52,8 @@ if [ "$1" = "--remove-all-data" ]; then
     rm -f ${LINKS_OUTPUT}
 else
     # Remove the Llamanator service without volumes
-    # Remove Ollama CPU
-    if [ "$ENABLE_OLLAMACPU" = "true" ]; then
-        echo "$(tput setaf 2)Removing Ollama CPU...$(tput sgr0)"
-        docker compose -f ${OLLAMACPU_COMPOSE_FILE} down
-    else
-        echo "$(tput setaf 3)Skipping Ollama CPU...$(tput sgr0)"
-    fi
-
-    # Remove Ollama GPU
-    if [ "$ENABLE_OLLAMAGPU" = "true" ]; then
-        echo "$(tput setaf 2)Removing Ollama GPU...$(tput sgr0)"
-        docker compose -f ${OLLAMAGPU_COMPOSE_FILE} down
-    else
-        echo "$(tput setaf 3)Skipping Ollama GPU...$(tput sgr0)"
-    fi
+    echo "$(tput setaf 2)Removing Ollama ...$(tput sgr0)"
+    docker compose -f ${OLLAMA_COMPOSE_FILE} down
 
     # Remove OpenWebUI
     if [ "$ENABLE_OPENWEBUI" = "true" ]; then
