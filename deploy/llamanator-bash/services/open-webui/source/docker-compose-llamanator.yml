@@ -1,13 +1,13 @@
 version: '3.8'
-
+name: ${LLAMANATOR_COMPOSE_GROUP_NAME:-highsideai-stack}
 services:
   open-webui:
-    image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG-main}
+    image: ghcr.io/open-webui/open-webui:${WEBUI_DOCKER_TAG:-main}
     container_name: open-webui
     volumes:
       - openwebui_data:/app/backend/data
     ports:
-      - ${OPENWEBUI_PORT-10000}:8080
+      - ${OPENWEBUI_PORT:-10000}:8080
     environment:
       - OLLAMA_BASE_URL=${OLLAMA_ENDPOINT}
       - WEBUI_SECRET_KEY=
